@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="SauceDemo Tests">
+    <test name="Login Tests">
+        <classes>
+            <class name="com.example.Tests.LoginTest"/>
+        </classes>
+    </test>
+</suite>
