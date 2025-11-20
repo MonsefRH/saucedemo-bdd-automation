@@ -21,13 +21,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - name: Install Google Chrome
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
 
-      - name: Verify Chrome version
-        run: google-chrome --version
+      - name: Display Chrome version
+        run: |
+          google-chrome --version
+          which google-chrome
 
       - name: Build & Run Tests
         run: mvn clean test -Pcucumber
