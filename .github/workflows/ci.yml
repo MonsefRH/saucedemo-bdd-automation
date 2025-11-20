@@ -23,7 +23,7 @@ jobs:
           cache: maven
 
       - name: Build & Run Tests
-        run: mvn clean test -Dcucumber.filter.tags="@smoke"
+        run: mvn clean test -Pcucumber
 
       - name: Upload Test Report
         if: always()

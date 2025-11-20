@@ -28,7 +28,7 @@ Feature: Checkout Process - SauceDemo
       | firstName   | lastName   | postalCode |
       | <firstname> | <lastname> | <postalcode>|
     And I continue to overview
-    Then I should see an error message "<error_message>"
+    Then I should see an error message with "<error_message>"
 
     Examples:
       | firstname | lastname | postalcode | error_message                       |

@@ -3,7 +3,6 @@ package com.example.stepdefs;
 import com.example.Pages.*;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
-
 import com.example.Utils.DriverFactory;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -13,68 +12,84 @@ import java.util.Map;
 public class CheckoutSteps {
 
     private final WebDriver driver = DriverFactory.getDriver();
-    private LoginPage loginPage = new LoginPage(driver);
-    private InventoryPage inventoryPage = new InventoryPage(driver);
-    private CartPage cartPage = new CartPage(driver);
-    private CheckoutStepOnePage checkoutStepOnePage = new CheckoutStepOnePage(driver);
-    private CheckoutStepTwoPage checkoutStepTwoPage = new CheckoutStepTwoPage(driver);
-    private CheckoutCompletePage checkoutCompletePage = new CheckoutCompletePage(driver);
+
 
     @When("I login as {string} with password {string}")
-    public void i_login_as_with_password(String string, String string2) {
-        loginPage.login(string, string2);
+    public void i_login_as_with_password(String username, String password) {
+        new LoginPage(driver).login(username, password);
     }
+
     @When("I add the {string} to cart")
-    public void i_add_the_to_cart(String ProductName) {
-        if (!inventoryPage.isOnInventoryPage()){
-            throw new Error("Not on inventory page");
+    public void i_add_the_to_cart(String productName) {
+        InventoryPage inventory = new InventoryPage(driver);
+        if (!inventory.isOnInventoryPage()) {
+            throw new RuntimeException("Not on inventory page");
         }
-        inventoryPage.AddToCart(ProductName);
+        inventory.AddToCart(productName);
     }
+
     @When("I go the cart")
     public void i_go_the_cart() {
-        inventoryPage.GoToCartPage();
+        new InventoryPage(driver).GoToCartPage();
     }
+
     @Then("The cart should contain {int} item")
-    public void the_cart_should_contain_item(Integer int1) {
-        Assert.assertTrue(cartPage.ProductExists(), "The cart should contain " + int1);
+    public void the_cart_should_contain_item(Integer expected) {
+        CartPage cart = new CartPage(driver);
+        Assert.assertTrue(cart.ProductExists(), "Cart should have " + expected + " item(s)");
     }
+
     @When("I proceed to checkout")
     public void i_proceed_to_checkout() {
-        cartPage.clickOnCheckout();
+        new CartPage(driver).clickOnCheckout();
     }
+
     @When("I fill the checkout form with:")
     public void i_fill_the_checkout_form_with(DataTable table) {
-        if (!checkoutStepOnePage.isOnCheckoutfirstPage()){
-            throw new Error("Not on step 1 of the checkout  page");
+        CheckoutStepOnePage step1 = new CheckoutStepOnePage(driver);
+        if (!step1.isOnCheckoutfirstPage()) {
+            throw new RuntimeException("Not on checkout step 1");
         }
-        Map<String, String> row = table.asMaps().get(0);
-        String first = row.get("firstName");
-        String last = row.get("lastName");
-        String postal = row.get("postalCode");
 
-        checkoutStepOnePage.SetfirstName(first != null ? first : "");
-        checkoutStepOnePage.SetlastName(last != null ? last : "");
-        checkoutStepOnePage.SetpostalCode(postal != null ? postal : "");
-
-
-
+        Map<String, String> data = table.asMaps().get(0);
+        step1.SetfirstName(getValueOrEmpty(data, "firstName"));
+        step1.SetlastName(getValueOrEmpty(data, "lastName"));
+        step1.SetpostalCode(getValueOrEmpty(data, "postalCode"));
     }
+
     @When("I continue to overview")
     public void i_continue_to_overview() {
-        checkoutStepOnePage.pressContinue();
+        new CheckoutStepOnePage(driver).pressContinue();
     }
+
     @When("I finish the checkout")
     public void i_finish_the_checkout() {
-        if (!checkoutStepTwoPage.isOnCheckoutTwoPage()){
-            throw new Error("Not on step 2 of the checkout  page");
+        CheckoutStepTwoPage step2 = new CheckoutStepTwoPage(driver);
+        if (!step2.isOnCheckoutTwoPage()) {
+            throw new RuntimeException("Not on step 2 of the checkout page. Current URL: " + driver.getCurrentUrl());
         }
-        checkoutStepTwoPage.clickOnFinishButton();
+        step2.clickOnFinishButton();
     }
+
     @Then("I should see the confirmation page {string}")
-    public void i_should_see_the_confirmation_page(String msg) {
-        Assert.assertEquals(checkoutCompletePage.getResultsHeaderText(),msg , "There is a difference between the existed and the expected messages  ");
+    public void i_should_see_the_confirmation_page(String expectedMessage) {
+        CheckoutCompletePage complete = new CheckoutCompletePage(driver);
+        String actual = complete.getResultsHeaderText();
+        Assert.assertEquals(actual, expectedMessage,
+                "Confirmation message mismatch. Expected: " + expectedMessage + " | Actual: " + actual);
     }
 
+    @Then("I should see an error message with {string}")
+    public void i_should_see_an_error_message_with(String expectedError) {
+        CheckoutStepOnePage step1 = new CheckoutStepOnePage(driver);
+        String actual = step1.GetErrorMessage();
+        Assert.assertTrue(actual.contains(expectedError),
+                "Expected error: '" + expectedError + "' but got: '" + actual + "'");
+    }
 
+    // Méthode utilitaire pour éviter les NullPointer
+    private String getValueOrEmpty(Map<String, String> map, String key) {
+        String value = map.get(key);
+        return value == null ? "" : value;
+    }
 }
