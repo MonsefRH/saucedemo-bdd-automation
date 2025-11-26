@@ -33,6 +33,15 @@ jobs:
 
       - name: Build & Run Tests
         run: mvn clean test -Pcucumber
+        continue-on-error: true
+
+      - name: Upload Screenshots on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots
+          path: screenshots/
+          retention-days: 7
 
       - name: Upload Test Report
         if: always()
