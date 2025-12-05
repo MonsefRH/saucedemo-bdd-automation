@@ -10,7 +10,7 @@ import java.time.Duration;
 
 public class CartPage extends BasePage {
 
-    @FindBy(className = "cart_item")
+    @FindBy(xpath = "/html/body/div/div/div/div[2]/div/div[1]/div[3]")
     private WebElement cart_item;
 
     @FindBy(name = "checkout")
