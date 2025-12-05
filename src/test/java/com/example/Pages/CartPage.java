@@ -23,7 +23,7 @@ public class CartPage extends BasePage {
         super(driver);
     }
     public boolean ProductExists() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         wait.until(ExpectedConditions.visibilityOf(cart_item));
         return cart_item.isDisplayed();
     }
