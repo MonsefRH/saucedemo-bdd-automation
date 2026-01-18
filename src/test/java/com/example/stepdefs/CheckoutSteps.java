@@ -12,41 +12,61 @@ import java.util.Map;
 public class CheckoutSteps {
 
     private final WebDriver driver = DriverFactory.getDriver();
+    private LoginPage loginPage;
+    private CartPage cartPage;
+    private CheckoutStepOnePage checkoutStepOnePage;
+    private CheckoutStepTwoPage checkoutStepTwoPage;
+    private CheckoutCompletePage checkoutCompletePage;
+
+    public LoginPage getLoginPage() {
+        if(loginPage == null){
+            loginPage = new LoginPage(driver);
+        }
+        return loginPage;
+    }
+    public CartPage getCartPage() {
+        if(cartPage == null){
+            cartPage = new CartPage(driver);
+        }
+        return cartPage;
+    }
+    public CheckoutStepOnePage getCheckoutStepOnePage() {
+        if(checkoutStepOnePage == null){
+            checkoutStepOnePage = new CheckoutStepOnePage(driver);
+        }
+        return checkoutStepOnePage;
+    }
+    public CheckoutStepTwoPage getCheckoutStepTwoPage() {
+        if(checkoutStepTwoPage == null){
+            checkoutStepTwoPage = new CheckoutStepTwoPage(driver);
+        }
+        return checkoutStepTwoPage;
+    }
+    public CheckoutCompletePage getCheckoutCompletePage() {
+        if(checkoutCompletePage == null){
+            checkoutCompletePage = new CheckoutCompletePage(driver);
+        }
+        return checkoutCompletePage;
+    }
 
 
     @When("I login as {string} with password {string}")
     public void i_login_as_with_password(String username, String password) {
-        new LoginPage(driver).login(username, password);
+        LoginPage login = getLoginPage();
+        login.login(username, password);
     }
 
-    @When("I add the {string} to cart")
-    public void i_add_the_to_cart(String productName) {
-        InventoryPage inventory = new InventoryPage(driver);
-        if (!inventory.isOnInventoryPage()) {
-            throw new RuntimeException("Not on inventory page");
-        }
-        inventory.AddToCart(productName);
-    }
 
-    @When("I go the cart")
-    public void i_go_the_cart() {
-        new InventoryPage(driver).GoToCartPage();
-    }
-
-    @Then("The cart should contain {int} item")
-    public void the_cart_should_contain_item(Integer expected) {
-        CartPage cart = new CartPage(driver);
-        Assert.assertTrue(cart.ProductExists(), "Cart should have " + expected + " item(s)");
-    }
 
     @When("I proceed to checkout")
     public void i_proceed_to_checkout() {
-        new CartPage(driver).clickOnCheckout();
+        CartPage cart = getCartPage();
+        cart.clickOnCheckout();
     }
 
     @When("I fill the checkout form with:")
     public void i_fill_the_checkout_form_with(DataTable table) {
-        CheckoutStepOnePage step1 = new CheckoutStepOnePage(driver);
+        CheckoutStepOnePage step1 = getCheckoutStepOnePage();
         if (!step1.isOnCheckoutfirstPage()) {
             throw new RuntimeException("Not on checkout step 1");
         }
@@ -59,21 +79,21 @@ public class CheckoutSteps {
 
     @When("I continue to overview")
     public void i_continue_to_overview() {
-        new CheckoutStepOnePage(driver).pressContinue();
+        CheckoutStepOnePage step1 = getCheckoutStepOnePage();
+        step1.pressContinue();
     }
 
     @When("I finish the checkout")
     public void i_finish_the_checkout() {
-        CheckoutStepTwoPage step2 = new CheckoutStepTwoPage(driver);
-        if (!step2.isOnCheckoutTwoPage()) {
-            throw new RuntimeException("Not on step 2 of the checkout page. Current URL: " + driver.getCurrentUrl());
-        }
+        CheckoutStepTwoPage step2 = getCheckoutStepTwoPage();
+        Assert.assertTrue(step2.isOnCheckoutTwoPage(),"Not on checkout step 2");
         step2.clickOnFinishButton();
     }
 
     @Then("I should see the confirmation page {string}")
     public void i_should_see_the_confirmation_page(String expectedMessage) {
-        CheckoutCompletePage complete = new CheckoutCompletePage(driver);
+        CheckoutCompletePage complete = getCheckoutCompletePage();
+        Assert.assertTrue(complete.isOnCheckoutCompletedPage(),"Not on checkout complete page");
         String actual = complete.getResultsHeaderText();
         Assert.assertEquals(actual, expectedMessage,
                 "Confirmation message mismatch. Expected: " + expectedMessage + " | Actual: " + actual);
@@ -81,7 +101,7 @@ public class CheckoutSteps {
 
     @Then("I should see an error message with {string}")
     public void i_should_see_an_error_message_with(String expectedError) {
-        CheckoutStepOnePage step1 = new CheckoutStepOnePage(driver);
+        CheckoutStepOnePage step1 = getCheckoutStepOnePage();
         String actual = step1.GetErrorMessage();
         Assert.assertTrue(actual.contains(expectedError),
                 "Expected error: '" + expectedError + "' but got: '" + actual + "'");

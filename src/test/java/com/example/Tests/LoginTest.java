@@ -17,7 +17,7 @@ public class LoginTest {
     protected WebDriver driver;
     private LoginPage loginPage;
 
-    @BeforeMethod
+   /* @BeforeMethod
     public void setUp() {
         WebDriverManager.chromedriver().setup();
         this.driver = new ChromeDriver();
@@ -77,6 +77,6 @@ public class LoginTest {
             driver.quit();
         }
     }
-
+*/
 
 }

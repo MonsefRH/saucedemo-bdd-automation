@@ -13,13 +13,13 @@ import org.testng.annotations.DataProvider;
                 "json:target/cucumber-reports/cucumber.json",
                 "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
         },
-        tags = "@smoke or @negative",
+        tags = "@checkout or @login or @logout or @cart",
         monochrome = true
 )
 public class CucumberTestRunner extends AbstractTestNGCucumberTests {
 
     @Override
-    @DataProvider(parallel = true)
+    @DataProvider(parallel = false)
     public Object[][] scenarios() {
         return super.scenarios();
     }

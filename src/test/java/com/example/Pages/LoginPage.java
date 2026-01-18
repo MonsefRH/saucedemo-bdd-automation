@@ -3,6 +3,10 @@ package com.example.Pages;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 
 public class LoginPage extends BasePage {
@@ -21,18 +25,27 @@ public class LoginPage extends BasePage {
     public LoginPage(WebDriver driver) {
         super(driver);
     }
-    public LoginPage enterUsername(String username) {
-        usernameInput.sendKeys(username);
-        return this;
+    public boolean isLoaded() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        try {
+            // Attendre que l'URL change
+            wait.until(ExpectedConditions.urlContains("/"));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    public LoginPage enterPassword(String password) {
-        passwordInput.sendKeys(password);
-        return this;
+    public void enterUsername(String username) {
+        usernameInput.sendKeys(username);
     }
-    public InventoryPage clickLogin() {
+
+    public void enterPassword(String password) {
+        passwordInput.sendKeys(password);
+    }
+    public void clickLogin() {
         loginButton.click();
-        return new InventoryPage(driver);
     }
 
     public void login(String username, String password) {

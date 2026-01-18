@@ -6,6 +6,9 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class DriverFactory {
     private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
@@ -16,7 +19,23 @@ public class DriverFactory {
             ChromeOptions options = new ChromeOptions();
 
             // Headless mode
-            options.addArguments("--headless=new");
+//            options.addArguments("--headless=new");
+
+// -----------------------------------------------------------
+            // 1. SOLUTION POUR LA POPUP MOT DE PASSE
+            // -----------------------------------------------------------
+            HashMap<Object, Object> prefs = new HashMap<>();
+            // Désactiver la suggestion de sauvegarde des mots de passe
+            prefs.put("credentials_enable_service", false);
+            prefs.put("profile.password_manager_enabled", false);
+            // Désactiver l'alerte de fuite de mot de passe (Leak Detection)
+            prefs.put("profile.password_manager_leak_detection", false);
+            prefs.put("safebrowsing.enabled", true); // Garder la sécu de base mais sans le password manager
+
+            options.setExperimentalOption("prefs", prefs);
+
+            // Désactiver la feature spécifique côté arguments aussi
+            options.addArguments("--disable-features=PasswordLeakDetection");
 
             // Essential security flags
             options.addArguments("--no-sandbox");
@@ -60,7 +79,7 @@ public class DriverFactory {
             webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
             webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
             webDriver.manage().timeouts().scriptTimeout(Duration.ofSeconds(30));
-            driver.set(new ChromeDriver(options));
+            driver.set(webDriver);
         }
         return driver.get();
     }
