@@ -19,7 +19,7 @@ public class DriverFactory {
             ChromeOptions options = new ChromeOptions();
 
             // Headless mode
-//            options.addArguments("--headless=new");
+            options.addArguments("--headless=new");
 
 // -----------------------------------------------------------
             // 1. SOLUTION POUR LA POPUP MOT DE PASSE
